@@ -5,22 +5,28 @@
   const STRINGS = {
     en: { title: "Eberhardt AI Assistant", placeholder: "Ask about our services...", send: "Send",
           greeting: "Hi! I can answer questions about Eberhardt AI's automation and website services. What would you like to know?",
-          error: "Something went wrong. Please email hello@eberhardt.ai or try again." },
+          error: "Something went wrong. Please email hello@eberhardt.ai or try again.",
+          rateLimited: "You've sent a lot of messages. Please wait a bit or email hello@eberhardt.ai." },
     de: { title: "Eberhardt AI Assistent", placeholder: "Fragen Sie uns etwas...", send: "Senden",
           greeting: "Hallo! Ich beantworte Fragen zu den Automatisierungs- und Website-Services von Eberhardt AI. Was möchten Sie wissen?",
-          error: "Etwas ist schiefgelaufen. Bitte schreiben Sie an hello@eberhardt.ai oder versuchen Sie es erneut." },
+          error: "Etwas ist schiefgelaufen. Bitte schreiben Sie an hello@eberhardt.ai oder versuchen Sie es erneut.",
+          rateLimited: "Sie haben viele Nachrichten gesendet. Bitte warten Sie kurz oder schreiben Sie an hello@eberhardt.ai." },
     fr: { title: "Assistant Eberhardt AI", placeholder: "Posez votre question...", send: "Envoyer",
           greeting: "Bonjour ! Je peux répondre à vos questions sur les services d'automatisation et de sites web d'Eberhardt AI. Que souhaitez-vous savoir ?",
-          error: "Une erreur s'est produite. Écrivez à hello@eberhardt.ai ou réessayez." },
+          error: "Une erreur s'est produite. Écrivez à hello@eberhardt.ai ou réessayez.",
+          rateLimited: "Vous avez envoyé beaucoup de messages. Patientez un peu ou écrivez à hello@eberhardt.ai." },
     it: { title: "Assistente Eberhardt AI", placeholder: "Fai una domanda...", send: "Invia",
           greeting: "Ciao! Posso rispondere a domande sui servizi di automazione e sviluppo siti di Eberhardt AI. Cosa vorresti sapere?",
-          error: "Qualcosa è andato storto. Scrivi a hello@eberhardt.ai o riprova." },
+          error: "Qualcosa è andato storto. Scrivi a hello@eberhardt.ai o riprova.",
+          rateLimited: "Hai inviato molti messaggi. Attendi un momento o scrivi a hello@eberhardt.ai." },
     ru: { title: "Ассистент Eberhardt AI", placeholder: "Задайте вопрос...", send: "Отправить",
           greeting: "Привет! Я отвечу на вопросы об автоматизации и разработке сайтов Eberhardt AI. Что вас интересует?",
-          error: "Что-то пошло не так. Напишите на hello@eberhardt.ai или попробуйте снова." },
+          error: "Что-то пошло не так. Напишите на hello@eberhardt.ai или попробуйте снова.",
+          rateLimited: "Вы отправили много сообщений. Подождите немного или напишите на hello@eberhardt.ai." },
     uk: { title: "Асистент Eberhardt AI", placeholder: "Поставте запитання...", send: "Надіслати",
           greeting: "Привіт! Я відповім на запитання про автоматизацію та розробку сайтів Eberhardt AI. Що вас цікавить?",
-          error: "Щось пішло не так. Напишіть на hello@eberhardt.ai або спробуйте ще раз." },
+          error: "Щось пішло не так. Напишіть на hello@eberhardt.ai або спробуйте ще раз.",
+          rateLimited: "Ви надіслали багато повідомлень. Зачекайте трохи або напишіть на hello@eberhardt.ai." },
   };
 
   function currentLang() {
@@ -105,6 +111,10 @@
       });
       const data = await res.json();
       typingEl.remove();
+      if (res.status === 429) {
+        addMessage("assistant", s.rateLimited);
+        return;
+      }
       if (!res.ok || data.error) throw new Error(data.error || "request failed");
       addMessage("assistant", data.reply);
       history.push({ role: "assistant", content: data.reply });
